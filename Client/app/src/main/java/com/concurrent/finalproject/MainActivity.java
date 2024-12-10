@@ -11,28 +11,27 @@ import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.concurrent.finalproject.interfaces.ProductDAO;
+import com.concurrent.finalproject.models.Product;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static String host = "192.168.18.107";
-    public static int port = 5672;
 
     EditText editTextIp, editTextPort;
     Button buttonConnect;
 
     Dialog waitDialog = null;
+
+    public static List<Product> products = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
         buttonConnect = findViewById(R.id.button_connect);
 
         buttonConnect.setOnClickListener(view -> {
-            host = editTextIp.getText().toString().trim();
-            port = Integer.parseInt(editTextPort.getText().toString().trim());
+            String host = editTextIp.getText().toString().trim();
+            String port = editTextPort.getText().toString().trim();
+            String baseUrl = "http://" + host + ":" + port + "/";
 
             if(waitDialog != null){
                 waitDialog.show();
@@ -54,101 +54,40 @@ public class MainActivity extends AppCompatActivity {
                 waitDialog.show();
             }
 
-            JSONObject messageJson = new JSONObject();
-            try {
-                messageJson.put("request", "INFO");
-            } catch (JSONException e) {
-                System.out.println("ERROR ON JSON creation:\n" + e.getMessage());
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
-            new Thread(() -> {
-                try {
-                    init();
-                    try {
-                        String data = call(messageJson.toString(), requestProductQueueName);
-                        if(data.equals("")){
-                            System.out.println("NO DATA WAS RETRIEVED");
-                            return;
+            ProductDAO productDAO = retrofit.create(ProductDAO.class);
+
+            Call<List<Product>> call = productDAO.getProducts();
+            call.enqueue(new Callback<List<Product>>() {
+                @Override
+                public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                    if(response.isSuccessful()){
+                        products = response.body();
+                        if(products != null){
+                            int tam = products.size();
+                            for(int i = 0; i < tam; i++){
+                                System.out.println(products.get(i));
+                            }
                         }
-                        //System.out.println(" [.] Got: '" + data + "'");
-                        Gson gson = new Gson();
-                        ProductResponse productResponse = gson.fromJson(data, ProductResponse.class);
-                        dismissWaitDialog();
-                        if("SUCCESS".equals(productResponse.getMessage())){
-                            Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
-                            intent.putExtra("products", productResponse.getResult());
-                            startActivity(intent);
-                        }
-                    } catch (IOException | InterruptedException | ExecutionException e) {
-                        System.out.println("ERROR ON CALL:\n" + e.getMessage());
+                        Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
+                        startActivity(intent);
+                    }else {
+                        System.out.println("FAILED");
                     }
-                } catch (IOException | TimeoutException e) {
                     dismissWaitDialog();
-                    System.out.println("ERROR ON INIT:\n" + e.getMessage());
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Failed to connect to " + host, Toast.LENGTH_SHORT).show());
                 }
-            }).start();
+
+                @Override
+                public void onFailure(Call<List<Product>> call, Throwable t) {
+                    System.out.println("onFailure: " + t.getMessage());
+                    dismissWaitDialog();
+                }
+            });
         });
-    }
-
-    private void init() throws IOException, TimeoutException{
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(host);
-        factory.setPort(port);
-        factory.setUsername(username);
-        factory.setPassword(password);
-
-        connection = factory.newConnection();
-        channel = connection.createChannel();
-    }
-
-    public static String call(String message, String requestQueueName) throws IOException, InterruptedException, ExecutionException {
-        final String corrId = UUID.randomUUID().toString();
-
-        String replyQueueName = channel.queueDeclare().getQueue();
-        AMQP.BasicProperties props = new AMQP.BasicProperties.Builder()
-                .correlationId(corrId)
-                .replyTo(replyQueueName)
-                .build();
-
-        channel.basicPublish("", requestQueueName, props, message.getBytes(StandardCharsets.UTF_8));
-        System.out.println("Sending " + message + " through " + requestQueueName + " queue. CorrId: " + corrId);
-
-        final CompletableFuture<String> response = new CompletableFuture<>();
-
-        String cTag = channel.basicConsume(replyQueueName, true, (consumerTag, delivery) -> {
-           if(delivery.getProperties().getCorrelationId().equals(corrId)){
-               response.complete(new String(delivery.getBody(), StandardCharsets.UTF_8));
-           }
-        }, consumerTag -> {});
-
-
-        String result;
-        try {
-            result = response.get(10, TimeUnit.SECONDS);
-        }catch (TimeoutException e){
-            channel.basicCancel(cTag);
-            System.out.println("Timeout reached, no response received. Closing connection.");
-            result="";
-        }finally {
-            channel.basicCancel(cTag);
-        }
-        return result;
-    }
-
-    public void closeConnection(){
-        new Thread(() -> {
-            try{
-                if(channel!= null && channel.isOpen()){
-                    channel.close();
-                }
-                if(connection != null &&  connection.isOpen()){
-                    connection.close();
-                }
-            }catch (IOException | TimeoutException e){
-                System.out.println("Error in CLOSE:\n" + e.getMessage());
-            }
-        }).start();
     }
 
     public static Dialog makeWaitDialog(Context context){

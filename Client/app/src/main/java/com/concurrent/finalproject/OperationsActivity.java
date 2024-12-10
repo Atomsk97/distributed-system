@@ -11,21 +11,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.concurrent.finalproject.models.Product;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class OperationsActivity extends AppCompatActivity {
 
     private final List<Product> listOfProductsToBuy = new ArrayList<>();
-
-    private Product[] products;
 
     private Button buttonConfirmUser;
 
@@ -56,14 +53,7 @@ public class OperationsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView_products);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        products = (Product[])getIntent().getSerializableExtra("products");
-        List<Product> productList;
-        if(products != null) {
-            productList = Arrays.asList(products);
-        }else{
-            productList = new ArrayList<>();
-            productList.add(new Product(0, "DEFAULT_PRODUCT_NAME", 0.0, 0));
-        }
+        List<Product> productList = MainActivity.products;
 
         ProductAdapter productAdapter = new ProductAdapter(productList);
         recyclerView.setAdapter(productAdapter);
@@ -85,6 +75,8 @@ public class OperationsActivity extends AppCompatActivity {
         });
 
         buttonAddProduct.setOnClickListener(view -> {
+            return;
+            /* TODO: IMPLEMENT ADD PRODUCT LOGIC
             int productId;
             try {
                 productId = Integer.parseInt(editTextProductId.getText().toString());
@@ -107,9 +99,10 @@ public class OperationsActivity extends AppCompatActivity {
                 return;
             }
 
-            listOfProductsToBuy.add(new Product(productId, "", 0.0, productAmount));
+            //listOfProductsToBuy.add(new Product(productId, "", 0.0, productAmount));
             totalAmount += getPrice(productId)*productAmount;
             showToast("Product added in the cart");
+             */
         });
 
         buttonSubmit.setOnClickListener(view -> {
@@ -141,7 +134,7 @@ public class OperationsActivity extends AppCompatActivity {
                 for(Product p : listOfProductsToBuy){
                     try {
                         JSONObject product = new JSONObject();
-                        product.put("id", p.getId());
+                        product.put("id", p.getID());
                         product.put("amount", p.getStock());
                         productsToBuy.put(product);
                     }catch (JSONException e){
@@ -159,65 +152,12 @@ public class OperationsActivity extends AppCompatActivity {
                 System.out.println("Error in JSON creations for the user:\n" + e.getMessage());
             }
 
-            new Thread(() -> {
-                try{
-                    String response = MainActivity.call(user.toString(), MainActivity.requestUserQueueName);
-                    Gson gson = new Gson();
-                    UserResponse userResponse = gson.fromJson(response, UserResponse.class);
-                    if(userResponse.getMessage().equals("SUCCESS")){
-                        response = MainActivity.call(message.toString(), MainActivity.requestProductQueueName);
-                        ProductResponse productResponse = gson.fromJson(response, ProductResponse.class);
-                        if(productResponse.getMessage().equals("SUCCESS")){
-                            dismissWaitDialog();
-                            runOnUiThread(() -> showToast("Transaction completed!"));
-                            runOnUiThread(() -> cleanEditText(true));
-                            updateRecyclerView();
-                            return;
-                        }
-                    }
-                    dismissWaitDialog();
-                    runOnUiThread(() -> showToast("Transaction failed"));
-                }catch (IOException | ExecutionException | InterruptedException e) {
-                    dismissWaitDialog();
-                    System.out.println("Error on call | couldn't sent the message:\n" + e.getMessage());
-                    runOnUiThread(() -> showToast("Failed to send the message"));
-                }
-            }).start();
-
         });
     }
 
     @Override
     public void onBackPressed(){
-        MainActivity mainActivity = (MainActivity) getParent();
-        if(mainActivity != null){
-            mainActivity.closeConnection();
-        }
         super.onBackPressed();
-    }
-
-    private boolean isIdCorrect(int id){
-        if(products != null){
-            for(Product product : products){
-                if(product.getId() == id){
-                    return true;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
-
-    private double getPrice(int id){
-        if(products != null){
-            for(Product product : products){
-                if(product.getId() == id){
-                    return product.getPrice();
-                }
-            }
-            return 0;
-        }
-        return 0;
     }
 
     private void cleanEditText(boolean hasToClean){
@@ -241,6 +181,7 @@ public class OperationsActivity extends AppCompatActivity {
         }
     }
 
+    /*
     private void updateRecyclerView(){
         JSONObject messageJson = new JSONObject();
         try {
@@ -266,6 +207,8 @@ public class OperationsActivity extends AppCompatActivity {
             System.out.println("ERROR ON JSON creation:\n" + e.getMessage());
         }
     }
+
+     */
 
     private void showToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.concurrent.finalproject.models.Product;
+
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemViewHolder> {
@@ -29,7 +31,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Product product = productList.get(position);
-        holder.textViewId.setText(String.valueOf(product.getId()));
+        holder.textViewId.setText(String.valueOf(product.getID()));
         holder.textViewName.setText(product.getName());
         holder.textViewPrice.setText(String.valueOf(product.getPrice()));
         holder.textViewStock.setText(String.valueOf(product.getStock()));

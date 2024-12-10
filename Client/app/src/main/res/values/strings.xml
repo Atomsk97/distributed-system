@@ -5,9 +5,9 @@
     <string name="textview_ip">IP</string>
     <string name="textview_port">PORT</string>
     <string name="textview_separator">:</string>
-    <string name="edittext_ip">192.168.18.107</string>
+    <string name="edittext_ip">127.0.0.1</string>
     <string name="edittext_ip_hint">IP of Server</string>
-    <string name="edittext_port">5672</string>
+    <string name="edittext_port">3000</string>
     <string name="edittext_port_hint">PORT of Server</string>
     <string name="button_connect">Connect to the Server</string>
 

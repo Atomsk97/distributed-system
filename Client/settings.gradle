@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RabbitMQ"
+rootProject.name = "finalproject"
 include ':app'

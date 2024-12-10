@@ -1,4 +1,4 @@
-package com.concurrent.rabbitmq;
+package com.concurrent.finalproject;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.concurrent.rabbitmq", appContext.getPackageName());
+        assertEquals("com.concurrent.FinalProject", appContext.getPackageName());
     }
 }

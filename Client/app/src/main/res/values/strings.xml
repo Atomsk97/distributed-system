@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">RabbitMQ</string>
+    <string name="app_name">FinalProject</string>
 
     <!-- START VIEW -->
     <string name="textview_ip">IP</string>
     <string name="textview_port">PORT</string>
     <string name="textview_separator">:</string>
     <string name="edittext_ip">192.168.18.107</string>
-    <string name="edittext_ip_hint">IP of RabbitMQ</string>
+    <string name="edittext_ip_hint">IP of Server</string>
     <string name="edittext_port">5672</string>
-    <string name="edittext_port_hint">PORT of rabbitMQ</string>
-    <string name="button_connect">Connect to RabbitMQ</string>
+    <string name="edittext_port_hint">PORT of Server</string>
+    <string name="button_connect">Connect to the Server</string>
 
     <!-- WAITING CARD -->
     <string name="textview_wait">Please, wait</string>

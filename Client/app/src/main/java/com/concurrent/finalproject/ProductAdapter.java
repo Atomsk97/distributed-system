@@ -1,4 +1,4 @@
-package com.concurrent.rabbitmq;
+package com.concurrent.finalproject;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -1,4 +1,4 @@
-package com.concurrent.rabbitmq;
+package com.concurrent.finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,12 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,14 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static String host = "192.168.18.107";
     public static int port = 5672;
-    public static final String username = "guest";
-    public static final String password = "guest";
-
-    public static final String requestProductQueueName = "queue_product";
-
-    public static final String requestUserQueueName = "queue_user";
-    public static Connection connection;
-    public static Channel channel;
 
     EditText editTextIp, editTextPort;
     Button buttonConnect;

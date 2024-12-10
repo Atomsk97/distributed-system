@@ -1,4 +1,4 @@
-package com.concurrent.rabbitmq;
+package com.concurrent.finalproject;
 
 import java.io.Serializable;
 

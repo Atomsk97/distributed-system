@@ -10,32 +10,41 @@ const dbPath = path.join(__dirname, '../db/sales.json');
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta para recibir ventas desde el cliente
-app.post('/ventas', (req, res) => {
-    const newSale = req.body;
+// Leer ventas desde sales.json
+const readSales = () => {
+    try {
+        const data = fs.readFileSync(dbPath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error leyendo el archivo de ventas:', error);
+        return [];
+    }
+};
 
-    // Leer el archivo JSON existente
-    fs.readFile(dbPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send({ message: 'Error leyendo la base de datos' });
+// Guardar ventas en sales.json
+const writeSales = (sales) => {
+    try {
+        fs.writeFileSync(dbPath, JSON.stringify(sales, null, 2), 'utf8');
+    } catch (error) {
+        console.error('Error guardando las ventas:', error);
+    }
+};
 
-        const sales = JSON.parse(data);
-        sales.push(newSale);
-
-        // Escribir los datos actualizados en el archivo JSON
-        fs.writeFile(dbPath, JSON.stringify(sales, null, 2), 'utf8', (err) => {
-            if (err) return res.status(500).send({ message: 'Error guardando la venta' });
-            res.status(200).send({ message: 'Venta registrada con éxito' });
-        });
-    });
+// Ruta para obtener todas las ventas
+app.get('/ventas', (req, res) => {
+    const sales = readSales();
+    res.status(200).json(sales);
 });
 
-// Ruta para obtener las ventas
-app.get('/ventas', (req, res) => {
-    fs.readFile(dbPath, 'utf8', (err, data) => {
-        if (err) return res.status(500).send({ message: 'Error leyendo la base de datos' });
+// Ruta para recibir y guardar nuevas ventas
+app.post('/ventas', (req, res) => {
+    const newSale = req.body;
+    const sales = readSales();
 
-        res.status(200).json(JSON.parse(data));
-    });
+    sales.push(newSale); // Agregar nueva venta
+    writeSales(sales);   // Guardar en sales.json
+
+    res.status(200).send({ message: 'Venta registrada con éxito', sales });
 });
 
 // Iniciar el servidor

@@ -1,15 +1,21 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('sales-table-body');
 
-    // Función para obtener ventas del servidor
+    // Función para obtener todas las ventas del backend
     async function fetchSales() {
-        const response = await fetch('/ventas');
-        return response.json();
+        try {
+            const response = await fetch('/ventas');
+            const sales = await response.json();
+            return sales;
+        } catch (error) {
+            console.error('Error al obtener ventas:', error);
+            return [];
+        }
     }
 
-    // Función para renderizar ventas
+    // Función para renderizar todas las ventas en la tabla
     function renderSales(sales) {
-        tableBody.innerHTML = '';
+        tableBody.innerHTML = ''; // Limpiar tabla
         sales.forEach(sale => {
             sale.details.forEach(detail => {
                 const row = `
@@ -26,7 +32,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Cargar ventas al cargar la página
-    const sales = await fetchSales();
-    renderSales(sales);
+    // Inicializar la aplicación
+    async function init() {
+        const sales = await fetchSales(); // Obtener ventas desde el servidor
+        renderSales(sales); // Renderizar ventas en la tabla
+    }
+
+    init(); // Cargar ventas al inicio
 });

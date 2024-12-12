@@ -8,10 +8,13 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.concurrent.finalproject.interfaces.ProductDAO;
+import com.concurrent.finalproject.interfaces.RequestBodyDAO;
 import com.concurrent.finalproject.models.Product;
+import com.concurrent.finalproject.models.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OperationsActivity extends AppCompatActivity {
 
@@ -29,7 +34,7 @@ public class OperationsActivity extends AppCompatActivity {
 
     private String userId;
 
-    private double totalAmount = 0;
+    //private double totalAmount = 0;
 
     private Dialog waitDialog = null;
 
@@ -46,7 +51,7 @@ public class OperationsActivity extends AppCompatActivity {
         Button buttonAddProduct = findViewById(R.id.button_add_product);
         Button buttonSubmit = findViewById(R.id.button_submit);
 
-        userId = java.util.UUID.randomUUID().toString();
+        userId = String.valueOf(Math.round(Math.random()*1000));
 
         recyclerView = findViewById(R.id.recyclerView_products);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,7 +86,7 @@ public class OperationsActivity extends AppCompatActivity {
                 return;
             }
 
-            totalAmount += getPrice(productId, productAmount);
+            //totalAmount += getPrice(productId, productAmount);
             listOfProductsToBuy.add(new Product(String.valueOf(productId), productAmount));
             editTextProductId.setText("");
             editTextAmount.setText("");
@@ -95,15 +100,42 @@ public class OperationsActivity extends AppCompatActivity {
                 return;
             }
 
-            if(waitDialog != null){
-                waitDialog.show();
-            }else{
-                waitDialog = MainActivity.makeWaitDialog(this);
-                waitDialog.show();
-            }
+            showWaitDialog();
+            List<RequestBody.Detail> details = new ArrayList<>();
+            listOfProductsToBuy.forEach(item -> {
+                details.add(new RequestBody.Detail(item.getID(), item.getStock(), item.getPrice()));
+            });
 
-           //TODO: Submit action with Retrofit
-            updateRecyclerView();
+            RequestBody requestBody = new RequestBody(userId, details);
+
+            Retrofit retrofitToSales = new Retrofit.Builder()
+                    .baseUrl("http: /")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            RequestBodyDAO dao = retrofitToSales.create(RequestBodyDAO.class);
+
+            Call<RequestBody> call = dao.sendData(requestBody);
+
+            call.enqueue(new Callback<RequestBody>() {
+                @Override
+                public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
+                    if (response.isSuccessful()) {
+                        System.out.println("YES");
+                    } else {
+                        System.out.println("OH NOUS");
+                    }
+                    updateRecyclerView();
+                    listOfProductsToBuy.clear();
+                    //totalAmount = 0;
+                }
+
+                @Override
+                public void onFailure(Call<RequestBody> call, Throwable t) {
+                    System.out.println("onFailure: " + t.getMessage());
+                    dismissWaitDialog();
+                }
+            });
         });
     }
 
@@ -112,9 +144,9 @@ public class OperationsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    private double getPrice(int productId, int productAmount) {
-        return productList.get(productId).getPrice() * productAmount;
-    }
+    //private double getPrice(int productId, int productAmount) {
+        //return productList.get(productId).getPrice() * productAmount;
+    //}
 
     private void updateRecyclerView() {
         ProductDAO productDAO = MainActivity.retrofit.create(ProductDAO.class);

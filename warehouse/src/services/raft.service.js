@@ -18,6 +18,7 @@ export default class RaftNode {
     return Math.floor(Math.random() * (3000 - 1500) + 1500);
   }
 
+  // Request votes to the other nodes
   startElection() {
     this.role = "candidate";
     this.currentTerm++;
@@ -31,7 +32,7 @@ export default class RaftNode {
     // Request votes form other nodes
     this.peers.forEach(async (peer) => {
       try {
-        const response = await axios.post(`http://${peer}/vote`, {
+        const response = await axios.post(`http://${peer}/raft/vote`, {
           term: this.currentTerm,
           candidateId: this.nodeId,
         });
@@ -66,7 +67,7 @@ export default class RaftNode {
 
     this.peers.forEach((peer) => {
       axios
-        .post(`http://${peer}/heartbeat`, {
+        .post(`http://${peer}/raft/heartbeat`, {
           term: this.currentTerm,
           leaderId: this.nodeId,
           log: this.log,
@@ -102,4 +103,6 @@ export default class RaftNode {
     }
     return { success: false };
   }
+
+
 }

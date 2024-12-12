@@ -2,7 +2,7 @@
   {
     "product_id": "1",
     "name": "Producto A",
-    "stock": 50,
+    "stock": 49,
     "price": 10.5
   },
   {
@@ -18,9 +18,15 @@
     "price": 15
   },
   {
-    "product_id": 4,
+    "product_id": "4",
     "name": "Producto D",
     "stock": 42,
     "price": 22
+  },
+  {
+    "product_id": "21",
+    "name": "product N",
+    "stock": 3,
+    "price": 9.99
   }
 ]

@@ -1,4 +1,4 @@
-product_id,name,quantity,price
+ID,name,stock,price
 1,Laptop,50,1200.99
 2,Mouse,200,19.99
 3,Keyboard,150,49.99

@@ -6,8 +6,13 @@ const app = express();
 const PORT = 4000;
 const dbPath = path.join(__dirname, '../db/warehouse.json');
 
+//servicio del html
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-
+// Ruta para la página de administración (/admin)
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 // Leer productos del almacén
 const readWarehouse = () => {
     try {
@@ -32,6 +37,24 @@ const writeWarehouse = (products) => {
 app.get('/almacen', (req, res) => {
     const products = readWarehouse();
     res.status(200).json(products);
+});
+// Ruta para modificar un producto
+app.put('/almacen/:id', (req, res) => {
+    const { id } = req.params;
+    const { stock, price } = req.body; // Solo actualizamos stock y precio
+
+    const products = readWarehouse();
+    const product = products.find(p => p.product_id === parseInt(id));
+
+    if (!product) {
+        return res.status(404).send({ message: 'Producto no encontrado.' });
+    }
+
+    product.stock = stock;
+    product.price = price;
+    writeWarehouse(products);
+
+    res.status(200).send({ message: 'Producto actualizado.' });
 });
 
 
@@ -105,6 +128,25 @@ app.put('/almacen/update-stock', (req, res) => {
         message: 'Proceso completado.',
         results
     });
+});
+// Ruta para agregar un nuevo producto
+app.post('/almacen', (req, res) => {
+    const newProduct = req.body;
+    const products = readWarehouse();
+    products.push(newProduct);
+    writeWarehouse(products);
+    res.status(201).send({ message: 'Producto agregado correctamente.' });
+});
+
+// Ruta para eliminar productos
+app.delete('/almacen', (req, res) => {
+    const { product_ids } = req.body;
+
+    let products = readWarehouse();
+    products = products.filter(product => !product_ids.includes(product.product_id));
+
+    writeWarehouse(products);
+    res.status(200).send({ message: 'Productos eliminados.' });
 });
 
 app.listen(PORT, () => {

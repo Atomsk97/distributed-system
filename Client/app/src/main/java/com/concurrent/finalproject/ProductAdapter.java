@@ -6,13 +6,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.concurrent.finalproject.models.Product;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemViewHolder> {
@@ -41,8 +41,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.textViewName.setText(product.getName());
         holder.textViewPrice.setText(String.valueOf(product.getPrice()));
         holder.textViewStock.setText(String.valueOf(product.getStock()));
+        if(product.getStock() < 1){
+            holder.imageViewShoppingCart.setEnabled(false);
+        }
         holder.imageViewShoppingCart.setOnClickListener(view -> {
-            editTextProductId.setText(product.getID());
+            editTextProductId.setText(product.getProduct_id());
             editTextAmount.setEnabled(true);
         });
     }

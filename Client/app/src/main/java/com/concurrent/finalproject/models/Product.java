@@ -3,29 +3,29 @@ package com.concurrent.finalproject.models;
 import androidx.annotation.NonNull;
 
 public class Product {
-    private String ID;
+    private String product_id;
     private String name;
     private int stock;
     private double price;
 
-    public Product(String ID, String name, int stock, double price) {
-        this.ID = ID;
+    public Product(String product_id, String name, int stock, double price) {
+        this.product_id = product_id;
         this.name = name;
         this.stock = stock;
         this.price = price;
     }
 
-    public Product(String ID, int stock) {
-        this.ID = ID;
+    public Product(String product_id, int stock) {
+        this.product_id = product_id;
         this.stock = stock;
     }
 
-    public String getID() {
-        return ID;
+    public String getProduct_id() {
+        return product_id;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setProduct_id(String product_id) {
+        this.product_id = product_id;
     }
 
     public String getName() {
@@ -55,6 +55,6 @@ public class Product {
     @NonNull
     @Override
     public String toString() {
-        return "{" + "ID:" + ID + ", name: " + name + ", stock: " + stock + ", price: " + price + "}";
+        return "{" + "ID:" + product_id + ", name: " + name + ", stock: " + stock + ", price: " + price + "}";
     }
 }

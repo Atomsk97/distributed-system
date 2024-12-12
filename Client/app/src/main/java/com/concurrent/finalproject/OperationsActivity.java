@@ -34,8 +34,6 @@ public class OperationsActivity extends AppCompatActivity {
 
     private String userId, baseSalesUrl;
 
-    //private double totalAmount = 0;
-
     private Dialog waitDialog = null;
 
     RecyclerView recyclerView;
@@ -90,7 +88,6 @@ public class OperationsActivity extends AppCompatActivity {
                 return;
             }
 
-            //totalAmount += getPrice(productId, productAmount);
             listOfProductsToBuy.add(new Product(String.valueOf(productId), productAmount));
             editTextProductId.setText("");
             editTextAmount.setText("");
@@ -106,9 +103,11 @@ public class OperationsActivity extends AppCompatActivity {
 
             showWaitDialog();
             List<RequestBody.Detail> details = new ArrayList<>();
-            listOfProductsToBuy.forEach(item -> {
-                details.add(new RequestBody.Detail(item.getID(), item.getStock(), item.getPrice()));
-            });
+            listOfProductsToBuy.forEach(item -> details.add(new RequestBody.Detail(item.getProduct_id(), item.getStock(), getPriceFromId(Integer.parseInt(item.getProduct_id())))));
+
+            for(int i = 0; i < details.size(); i++){
+                System.out.println(details.get(i).getPrice());
+            }
 
             RequestBody requestBody = new RequestBody(userId, details);
 
@@ -126,14 +125,11 @@ public class OperationsActivity extends AppCompatActivity {
                 public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
                     if (response.isSuccessful()) {
                         runOnUiThread(() -> showToast("Transaction completed!"));
-                        System.out.println("YES");
                     } else {
                         runOnUiThread(() -> showToast("Something went wrong in the server"));
-                        System.out.println("OH NOUS");
                     }
                     updateRecyclerView();
                     listOfProductsToBuy.clear();
-                    //totalAmount = 0;
                 }
 
                 @Override
@@ -145,14 +141,18 @@ public class OperationsActivity extends AppCompatActivity {
         });
     }
 
+    private double getPriceFromId(int id){
+        int index = 0;
+        for(int i = 0; i < productList.size(); i++){
+            
+        }
+        return productList.get(id - 1).getPrice();
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-    //private double getPrice(int productId, int productAmount) {
-        //return productList.get(productId).getPrice() * productAmount;
-    //}
 
     private void updateRecyclerView() {
         ProductDAO productDAO = MainActivity.retrofit.create(ProductDAO.class);

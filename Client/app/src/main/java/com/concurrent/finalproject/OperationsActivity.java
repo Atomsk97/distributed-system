@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,13 +25,9 @@ public class OperationsActivity extends AppCompatActivity {
     private final List<Product> listOfProductsToBuy = new ArrayList<>();
     List<Product> productList;
 
-    private Button buttonConfirmUser;
-
-    private EditText editTextUserId, editTextProductId, editTextAmount;
+    private EditText editTextProductId, editTextAmount;
 
     private String userId;
-
-    private boolean userIsSet;
 
     private double totalAmount = 0;
 
@@ -45,78 +40,57 @@ public class OperationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operations);
 
-        editTextUserId = findViewById(R.id.editText_user_id);
         editTextProductId = findViewById(R.id.editText_product_id);
         editTextAmount = findViewById(R.id.editText_amount);
+        ImageView imageViewRefresh = findViewById(R.id.imageViewRefresh);
         Button buttonAddProduct = findViewById(R.id.button_add_product);
         Button buttonSubmit = findViewById(R.id.button_submit);
-        buttonConfirmUser = findViewById(R.id.button_confirm_user);
+
+        userId = java.util.UUID.randomUUID().toString();
 
         recyclerView = findViewById(R.id.recyclerView_products);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         productList = MainActivity.products;
 
-        ProductAdapter productAdapter = new ProductAdapter(productList);
+        ProductAdapter productAdapter = new ProductAdapter(productList, editTextProductId, editTextAmount);
         recyclerView.setAdapter(productAdapter);
 
         waitDialog = MainActivity.makeWaitDialog(this);
 
-        buttonConfirmUser.setOnClickListener(view -> {
-            if(editTextUserId.getText().toString().equals("")){
-                showToast("UserID cannot be empty");
-                return;
-            }
-            if (!userIsSet){
-                cleanEditText(false);
-                showToast("UserID set to " + userId);
-            }else{
-                cleanEditText(true);
-                showToast("UserID unsetted.\nChart cleared.");
-            }
+        imageViewRefresh.setOnClickListener(view -> {
+            updateRecyclerView();
         });
 
         buttonAddProduct.setOnClickListener(view -> {
             int productId;
             try {
                 productId = Integer.parseInt(editTextProductId.getText().toString());
-            }catch (Exception e){
+            } catch (Exception e) {
                 productId = 0;
             }
             int productAmount;
             try {
                 productAmount = Integer.parseInt(editTextAmount.getText().toString());
-            }catch (Exception e){
+            } catch (Exception e) {
                 productAmount = 0;
             }
 
-            /*
-            if(!isIdCorrect(productId)){
-                showToast("ID not found in list");
-                return;
-            }
-             */
-
-            if(productAmount <= 0){
+            if (productAmount <= 0) {
                 showToast("Can not add an empty amount");
                 return;
             }
 
-            //totalAmount += getPrice(productId)*productAmount;
-            totalAmount += 1;
+            totalAmount += getPrice(productId, productAmount);
             listOfProductsToBuy.add(new Product(String.valueOf(productId), productAmount));
             editTextProductId.setText("");
             editTextAmount.setText("");
+            editTextAmount.setEnabled(false);
             showToast("Product added in the cart");
         });
 
         buttonSubmit.setOnClickListener(view -> {
-            if(!userIsSet){
-                showToast("Confirm the UserId with the button on the right side");
-                return;
-            }
-
-            if(listOfProductsToBuy.size() < 1){
+            if (listOfProductsToBuy.size() < 1) {
                 showToast("Empty list");
                 return;
             }
@@ -134,48 +108,32 @@ public class OperationsActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         super.onBackPressed();
     }
 
-    private void cleanEditText(boolean hasToClean){
-        if(hasToClean){
-            userId = "";
-            userIsSet = false;
-            buttonConfirmUser.setTextColor(Color.rgb(63,216, 63));//"#3FD83F"
-            editTextUserId.setText("");
-            editTextProductId.setText("");
-            editTextAmount.setText("");
-            buttonConfirmUser.setText("✓");
-            editTextUserId.setEnabled(true);
-            listOfProductsToBuy.clear();
-            totalAmount = 0;
-        }else{
-            userId = editTextUserId.getText().toString();
-            userIsSet = true;
-            buttonConfirmUser.setTextColor(Color.rgb(223,23, 23));//"#DF1717"
-            buttonConfirmUser.setText("X");
-            editTextUserId.setEnabled(false);
-        }
+    private double getPrice(int productId, int productAmount) {
+        return productList.get(productId).getPrice() * productAmount;
     }
 
-    private void updateRecyclerView(){
+    private void updateRecyclerView() {
         ProductDAO productDAO = MainActivity.retrofit.create(ProductDAO.class);
         Call<List<Product>> call = productDAO.getProducts();
+        showWaitDialog();
 
         call.enqueue(new Callback<List<Product>>() {
             @Override
             public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     productList = response.body();
-                    if(productList != null){
-                        runOnUiThread(() -> recyclerView.setAdapter(new ProductAdapter(productList)));
+                    if (productList != null) {
+                        runOnUiThread(() -> recyclerView.setAdapter(new ProductAdapter(productList, editTextProductId, editTextAmount)));
                         System.out.println("LIST UPDATED!");
-                    }else{
+                    } else {
                         System.out.println("LIST IS EMPTY!");
                     }
                     dismissWaitDialog();
-                }else{
+                } else {
                     System.out.println("FAILED IN RESPONSE");
                     dismissWaitDialog();
                 }
@@ -190,12 +148,21 @@ public class OperationsActivity extends AppCompatActivity {
     }
 
 
-    private void showToast(String message){
+    private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    private void dismissWaitDialog(){
-        if(waitDialog != null){
+    private void showWaitDialog() {
+        if (waitDialog != null) {
+            waitDialog.show();
+        } else {
+            waitDialog = MainActivity.makeWaitDialog(this);
+            waitDialog.show();
+        }
+    }
+
+    private void dismissWaitDialog() {
+        if (waitDialog != null) {
             waitDialog.dismiss();
         }
     }
@@ -204,7 +171,7 @@ public class OperationsActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        if(waitDialog != null){
+        if (waitDialog != null) {
             waitDialog.dismiss();
             waitDialog = null;
         }

@@ -18,6 +18,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/recyclerView_products"/>
 
+    <ImageView
+        android:id="@+id/imageViewRefresh"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView_products"
+        android:src="@drawable/refresh_icon"
+        android:contentDescription="@string/img_content_description_refresh" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_products"
         android:layout_width="match_parent"
@@ -37,7 +47,7 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_gravity="center"
-        android:layout_marginVertical="12dp"
+        android:layout_marginVertical="32dp"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView_products"
         app:layout_constraintBottom_toBottomOf="parent"
         >
@@ -66,45 +76,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/textview_user"
-                android:textSize="20sp"
-                android:gravity="center_vertical"
-                android:layout_marginEnd="8dp"
-                />
-
-            <EditText
-                android:id="@+id/editText_user_id"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:hint="@string/edittext_user_hint"
-                android:textAlignment="center"
-                android:textSize="16sp"
-                android:inputType="text"
-                android:importantForAutofill="no"
-                />
-
-            <Button
-                android:id="@+id/button_confirm_user"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:text="@string/button_confirm_user"
-                android:textSize="16sp"
-                android:textColor="#3FD83F"
-                android:layout_marginHorizontal="8dp"
-                style="?android:attr/buttonBarButtonStyle"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:text="@string/textview_product"
                 android:textSize="20sp"
                 android:gravity="center_vertical"
@@ -117,6 +88,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
                 android:hint="@string/editText_product_hint"
+                android:enabled="false"
                 android:textAlignment="center"
                 android:textSize="16sp"
                 android:inputType="number"
@@ -130,6 +102,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
                 android:hint="@string/editText_amount_hint"
+                android:enabled="false"
                 android:textAlignment="center"
                 android:textSize="16sp"
                 android:inputType="number"

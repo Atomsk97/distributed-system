@@ -49,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
             String port = editTextPort.getText().toString().trim();
             String baseUrl = "http://" + host + ":" + port + "/";
 
-            if(waitDialog != null){
+            setRetrofit(baseUrl);
+
+            if (waitDialog != null) {
                 waitDialog.show();
-            }else{
+            } else {
                 waitDialog = makeWaitDialog(this);
                 waitDialog.show();
             }
@@ -67,18 +69,18 @@ public class MainActivity extends AppCompatActivity {
             call.enqueue(new Callback<List<Product>>() {
                 @Override
                 public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                    if(response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         products = response.body();
-                        if(products != null){
+                        if (products != null) {
                             int tam = products.size();
-                            for(int i = 0; i < tam; i++){
+                            for (int i = 0; i < tam; i++) {
                                 System.out.println(products.get(i));
                             }
                         }
                         dismissWaitDialog();
                         Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
                         startActivity(intent);
-                    }else {
+                    } else {
                         System.out.println("FAILED");
                         dismissWaitDialog();
                     }
@@ -93,12 +95,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static Dialog makeWaitDialog(Context context){
+    public static Dialog makeWaitDialog(Context context) {
         Dialog waitDialog = new Dialog(context);
         waitDialog.setCancelable(false);
         waitDialog.setContentView(R.layout.custom_waiting_dialog);
 
-        if(waitDialog.getWindow() != null){
+        if (waitDialog.getWindow() != null) {
             waitDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             waitDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -106,32 +108,15 @@ public class MainActivity extends AppCompatActivity {
         return waitDialog;
     }
 
-    public static void retrieveProducts(){
-        if(retrofit != null){
-            ProductDAO productDAO = retrofit.create(ProductDAO.class);
-            Call<List<Product>> call = productDAO.getProducts();
-
-            call.enqueue(new Callback<List<Product>>() {
-                @Override
-                public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                    if(response.isSuccessful()){
-                        products = response.body();
-                        System.out.println("PRODUCTS RETRIEVED");
-                    }else{
-                        System.out.println("FAIL ON RESPONSE");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Product>> call, Throwable t) {
-                    System.out.println("FAIL TO RETRIEVE THE PRODUCT LIST:\n" + t.getMessage());
-                }
-            });
-        }
+    public static void setRetrofit(String baseUrl) {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
     }
 
-    private void dismissWaitDialog(){
-        if(waitDialog != null){
+    private void dismissWaitDialog() {
+        if (waitDialog != null) {
             waitDialog.dismiss();
         }
     }
@@ -140,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        if(waitDialog != null){
+        if (waitDialog != null) {
             waitDialog.dismiss();
             waitDialog = null;
         }

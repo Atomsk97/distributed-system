@@ -13,7 +13,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta al archivo que contiene la IP del servidor de almacén
 const almacenIpPath = path.join(__dirname, 'almacen_ip.txt');
-
+// Ruta para enviar el archivo index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+// Endpoint para obtener las ventas
+app.get('/ventas', (req, res) => {
+    try {
+        const data = fs.readFileSync(dbPath, 'utf8');
+        const sales = JSON.parse(data);
+        res.status(200).json(sales);
+    } catch (error) {
+        console.error('Error al leer sales.json:', error);
+        res.status(500).send('Error al leer la base de datos de ventas.');
+    }
+});
 // Función para leer la IP del almacén desde el archivo
 const obtenerIpAlmacen = () => {
     try {
@@ -44,6 +58,7 @@ const writeSales = (sales) => {
         console.error('Error guardando las ventas:', error);
     }
 };
+
 
 // Ruta para recibir y guardar nuevas ventas
 app.post('/ventas', async (req, res) => {

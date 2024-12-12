@@ -91,7 +91,7 @@
                 android:enabled="false"
                 android:textAlignment="center"
                 android:textSize="16sp"
-                android:inputType="number"
+                android:inputType="text"
                 android:importantForAutofill="no"
                 android:layout_marginEnd="4dp"
                 />

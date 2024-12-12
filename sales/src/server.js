@@ -44,7 +44,7 @@ app.post('/ventas', (req, res) => {
     sales.push(newSale); // Agregar nueva venta
     writeSales(sales);   // Guardar en sales.json
 
-    res.status(200).send({ message: 'Venta registrada con éxito', sales });
+    res.status(200).send({ message: 'Venta registrada con éxito' });
 });
 
 // Iniciar el servidor

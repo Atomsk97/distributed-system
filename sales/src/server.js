@@ -78,7 +78,8 @@ app.post('/ventas', async (req, res) => {
         // Crear un arreglo con los productos y sus cantidades para enviar al almacén
         const productsToUpdate = newSale.details.map(item => ({
             product_id: item.product_id,
-            amount: item.amount
+            amount: item.amount,
+            price: item.price
         }));
 
         // Enviar la solicitud PUT al almacén para actualizar el stock

@@ -12,6 +12,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>ID Venta</th>
                     <th>Client ID</th>
                     <th>Producto ID</th>
                     <th>Cantidad</th>
@@ -23,7 +24,15 @@
                 <!-- Aquí se generarán las filas dinámicamente -->
             </tbody>
         </table>
+
+        <hr>
+
+        <h2>Generar Boleta</h2>
+        <label for="venta-id">Seleccione el ID de la Venta:</label>
+        <input type="number" id="venta-id" placeholder="ID de Venta" min="1">
+        <button id="generate-boleta">Generar Boleta</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

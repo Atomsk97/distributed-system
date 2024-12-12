@@ -96,6 +96,43 @@ app.post('/ventas', async (req, res) => {
     }
 });
 
+app.get('/ventas/boleta/:client_id', (req, res) => {
+    const { client_id } = req.params;
+
+    try {
+        const sales = readSales(); // Leer ventas de sales.json
+        const sale = sales.find(s => s.client_id === client_id); // Buscar la venta
+
+        if (!sale) {
+            return res.status(404).send('<h1>Venta no encontrada</h1>');
+        }
+
+        const boletaHtml = `
+            <html>
+            <head>
+                <title>Boleta</title>
+            </head>
+            <body>
+                <h1>Boleta de Venta</h1>
+                <p>Cliente ID: ${sale.client_id}</p>
+                <ul>
+                    ${sale.details.map(item => `
+                        <li>
+                            Producto: ${item.product_id}, Cantidad: ${item.amount}, Precio: ${item.price}
+                        </li>
+                    `).join('')}
+                </ul>
+                <p>Total: ${sale.details.reduce((sum, item) => sum + item.price * item.amount, 0)}</p>
+            </body>
+            </html>
+        `;
+        res.status(200).send(boletaHtml);
+    } catch (error) {
+        console.error('Error al generar la boleta:', error);
+        res.status(500).send('<h1>Error al generar la boleta</h1>');
+    }
+});
+
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
+const { exec } = require('child_process');
 
 // Ruta de archivos
 const salesPath = path.join(__dirname, '../db/sales.json');
@@ -17,34 +17,18 @@ const readNodeIPs = () => {
     }
 };
 
-// Función para replicar sales.json a un nodo
-const replicateToNode = (nodeIP, data) => {
+// Función para replicar sales.json a un nodo usando cURL
+const replicateToNodeWithCurl = (nodeIP, data) => {
     return new Promise((resolve, reject) => {
-        const options = {
-            hostname: nodeIP,
-            port: 3000, // Asegúrate de que los nodos escuchen en este puerto
-            path: '/replicate',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(data)
-            }
-        };
+        const curlCommand = `curl -X POST -H "Content-Type: application/json" -d '${data}' http://${nodeIP}:3000/replicate`;
 
-        const req = http.request(options, (res) => {
-            if (res.statusCode === 200) {
-                resolve(`Replicación exitosa en ${nodeIP}`);
+        exec(curlCommand, (error, stdout, stderr) => {
+            if (error) {
+                reject(`Error replicando en ${nodeIP}: ${stderr || error.message}`);
             } else {
-                reject(`Error replicando en ${nodeIP}: ${res.statusCode}`);
+                resolve(`Replicación exitosa en ${nodeIP}`);
             }
         });
-
-        req.on('error', (error) => {
-            reject(`Error al conectar con ${nodeIP}: ${error.message}`);
-        });
-
-        req.write(data);
-        req.end();
     });
 };
 
@@ -57,7 +41,7 @@ const replicateSales = async () => {
         // Replicar datos a cada nodo
         for (const nodeIP of nodes) {
             try {
-                const result = await replicateToNode(nodeIP, salesData);
+                const result = await replicateToNodeWithCurl(nodeIP, salesData);
                 console.log(result);
             } catch (error) {
                 console.error(error);
@@ -67,5 +51,13 @@ const replicateSales = async () => {
         console.error('Error replicando ventas:', error);
     }
 };
+
+// Vigilar cambios en sales.json y replicar automáticamente
+fs.watch(salesPath, (eventType) => {
+    if (eventType === 'change') {
+        console.log('sales.json ha sido modificado, replicando...');
+        replicateSales();
+    }
+});
 
 module.exports = { replicateSales };

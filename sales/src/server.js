@@ -60,14 +60,18 @@ app.post('/ventas', async (req, res) => {
     }
 
     try {
-        // Enviar cada producto de la venta al servidor de almacén
-        for (let item of newSale.details) {
-            const url = `http://${ipAlmacen}:4000/almacen/${item.product_id}`;
-            const data = { stock: item.amount };
+        // Crear un arreglo con los productos y sus cantidades para enviar al almacén
+        const productsToUpdate = newSale.details.map(item => ({
+            product_id: item.product_id,
+            amount: item.amount
+        }));
 
-            // Enviar la solicitud PUT para actualizar el stock del producto
-            await axios.put(url, data);
-        }
+        // Enviar la solicitud PUT al almacén para actualizar el stock
+        const url = `http://${ipAlmacen}:4000/almacen/update-stock`;  // Suponiendo que el endpoint es '/almacen/update-stock'
+        const data = { products: productsToUpdate };
+
+        // Enviar la solicitud PUT para actualizar el stock del almacén
+        await axios.put(url, data);
 
         res.status(200).send({ message: 'Venta registrada y stock actualizado' });
     } catch (error) {

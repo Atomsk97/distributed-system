@@ -34,7 +34,7 @@ const obtenerIpAlmacen = () => {
         const ip = fs.readFileSync(almacenIpPath, 'utf8').trim();
         return ip;
     } catch (error) {
-        console.error('Error al leer el archivo de IP del almacén:', error);
+        console.error('Error al leer el archivo de IP del almacén:', error.message);
         return null;
     }
 };
@@ -45,7 +45,7 @@ const readSales = () => {
         const data = fs.readFileSync(dbPath, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        console.error('Error leyendo el archivo de ventas:', error);
+        console.error('Error leyendo el archivo de ventas:', error.message);
         return [];
     }
 };
@@ -55,7 +55,7 @@ const writeSales = (sales) => {
     try {
         fs.writeFileSync(dbPath, JSON.stringify(sales, null, 2), 'utf8');
     } catch (error) {
-        console.error('Error guardando las ventas:', error);
+        console.error('Error guardando las ventas:', error.message);
     }
 };
 
@@ -90,7 +90,7 @@ app.post('/ventas', async (req, res) => {
 
         res.status(200).send({ message: 'Venta registrada y stock actualizado' });
     } catch (error) {
-        console.error('Error al actualizar el stock en el almacén:', error);
+        console.error('Error al actualizar el stock en el almacén:', error.message);
         res.status(500).send({ message: 'Error al actualizar el stock' });
     }
 });

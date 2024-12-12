@@ -13,8 +13,15 @@ export const getAllProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const newProduct = req.body.newproduct;
+    const { name, stock, price } = req.body;
     const products = await readData();
+    const id = products.length;
+    const newProduct = {
+      ID: id,
+      name,
+      stock,
+      price,
+    };
     products.push(newProduct);
     await writeData(products);
     return res.status(201).json({ message: "Producto creado: ", newProduct });
@@ -28,14 +35,14 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateProduct = req.body.updateproduct;
+    const { name, stock, price } = req.body;
     if (!id) {
       return res
         .status(400)
         .json({ message: "Producto a actualizar no especificado" });
     }
 
-    if (!updateProduct) {
+    if (!name || !stock || !price) {
       return res.status(400).json({ message: "Actualizacion vacia" });
     }
 
@@ -45,6 +52,13 @@ export const updateProduct = async (req, res) => {
     if (index === -1) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
+
+    const updateProduct = {
+      ID: id,
+      name,
+      stock,
+      price,
+    };
 
     products[index] = { ...products[index], ...updateProduct };
     await writeData(products);

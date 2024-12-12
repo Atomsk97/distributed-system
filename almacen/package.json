@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node src/warehouse.js"
+  },
   "dependencies": {
     "express": "^4.21.2"
   }

@@ -2,8 +2,10 @@
     <string name="app_name">FinalProject</string>
 
     <!-- START VIEW -->
-    <string name="textview_ip">IP</string>
-    <string name="textview_port">PORT</string>
+    <string name="textview_ip">WAREHOUSE IP</string>
+    <string name="textview_port">WAREHOUSE PORT</string>
+    <string name="textview_sale_ip">SALES IP</string>
+    <string name="textview_sale_port">SALES PORT</string>
     <string name="textview_separator">:</string>
     <string name="edittext_ip">127.0.0.1</string>
     <string name="edittext_ip_hint">IP of Server</string>
@@ -15,17 +17,16 @@
     <string name="textview_wait">Please, wait</string>
 
     <!-- TRANSACTION VIEW -->
-    <string name="img_content_description">Image of the product</string>
+    <string name="img_content_description_product">Image of the product</string>
     <string name="textview_list_of_products">List of products</string>
+    <string name="img_content_description_shop">Image of shopping cart</string>
+    <string name="img_content_description_refresh">Image of refreshing icon</string>
     <string name="textview_transaction">Transaction</string>
-    <string name="textview_user">User ID</string>
-    <string name="edittext_user_hint">Enter the user ID</string>
-    <string name="textview_product">Product ID</string>
-    <string name="editText_product_hint">ID of the product</string>
     <string name="editText_amount_hint">Amount to buy</string>
-    <string name="button_confirm_user">✓</string>
     <string name="button_add_product">Add</string>
     <string name="button_submit">Submit</string>
+    <string name="textview_product">Product ID</string>
+    <string name="editText_product_hint">ID of the product</string>
 
     <!-- RECYCLER VIEW -->
     <string name="textview_product_id">(ID)</string>

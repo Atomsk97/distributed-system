@@ -8,6 +8,18 @@ public class Product {
     private int stock;
     private double price;
 
+    public Product(String ID, String name, int stock, double price) {
+        this.ID = ID;
+        this.name = name;
+        this.stock = stock;
+        this.price = price;
+    }
+
+    public Product(String ID, int stock) {
+        this.ID = ID;
+        this.stock = stock;
+    }
+
     public String getID() {
         return ID;
     }
@@ -43,7 +55,6 @@ public class Product {
     @NonNull
     @Override
     public String toString() {
-        return "{\n" + "ID:" + ID + "\nname: " + name + "\nstock: " + stock + "\nprice: " + price +
-                "\n}";
+        return "{" + "ID:" + ID + ", name: " + name + ", stock: " + stock + ", price: " + price + "}";
     }
 }

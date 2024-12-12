@@ -26,12 +26,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editTextIp, editTextPort;
+    EditText editTextIp, editTextPort, editTextSaleIp, editTextSalePort;
     Button buttonConnect;
 
     Dialog waitDialog = null;
 
     public static List<Product> products = new ArrayList<>();
+
+    public static Retrofit retrofit = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         editTextIp = findViewById(R.id.editText_ip);
         editTextPort = findViewById(R.id.editText_port);
+        editTextSaleIp = findViewById(R.id.editText_sale_ip);
+        editTextSalePort = findViewById(R.id.editText_sale_port);
         buttonConnect = findViewById(R.id.button_connect);
 
         buttonConnect.setOnClickListener(view -> {
@@ -47,17 +51,14 @@ public class MainActivity extends AppCompatActivity {
             String port = editTextPort.getText().toString().trim();
             String baseUrl = "http://" + host + ":" + port + "/";
 
-            if(waitDialog != null){
+            setRetrofit(baseUrl);
+
+            if (waitDialog != null) {
                 waitDialog.show();
-            }else{
+            } else {
                 waitDialog = makeWaitDialog(this);
                 waitDialog.show();
             }
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
 
             ProductDAO productDAO = retrofit.create(ProductDAO.class);
 
@@ -65,20 +66,23 @@ public class MainActivity extends AppCompatActivity {
             call.enqueue(new Callback<List<Product>>() {
                 @Override
                 public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                    if(response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         products = response.body();
-                        if(products != null){
+                        if (products != null) {
                             int tam = products.size();
-                            for(int i = 0; i < tam; i++){
+                            for (int i = 0; i < tam; i++) {
                                 System.out.println(products.get(i));
                             }
                         }
+                        dismissWaitDialog();
                         Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
+                        intent.putExtra("saleIP", editTextSaleIp.getText().toString());
+                        intent.putExtra("salePORT", editTextSalePort.getText().toString());
                         startActivity(intent);
-                    }else {
+                    } else {
                         System.out.println("FAILED");
+                        dismissWaitDialog();
                     }
-                    dismissWaitDialog();
                 }
 
                 @Override
@@ -90,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static Dialog makeWaitDialog(Context context){
+    public static Dialog makeWaitDialog(Context context) {
         Dialog waitDialog = new Dialog(context);
         waitDialog.setCancelable(false);
         waitDialog.setContentView(R.layout.custom_waiting_dialog);
 
-        if(waitDialog.getWindow() != null){
+        if (waitDialog.getWindow() != null) {
             waitDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             waitDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -103,8 +107,15 @@ public class MainActivity extends AppCompatActivity {
         return waitDialog;
     }
 
-    private void dismissWaitDialog(){
-        if(waitDialog != null){
+    public static void setRetrofit(String baseUrl) {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
+
+    private void dismissWaitDialog() {
+        if (waitDialog != null) {
             waitDialog.dismiss();
         }
     }
@@ -113,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        if(waitDialog != null){
+        if (waitDialog != null) {
             waitDialog.dismiss();
             waitDialog = null;
         }

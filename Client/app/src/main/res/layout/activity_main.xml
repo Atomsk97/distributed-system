@@ -40,7 +40,7 @@
                 android:layout_weight="1"
                 android:text="@string/textview_ip"
                 android:textAlignment="center"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 />
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_weight="1"
                 android:text="@string/textview_port"
                 android:textAlignment="center"
-                android:textSize="24sp"/>
+                android:textSize="20sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -89,6 +89,80 @@
 
             <EditText
                 android:id="@+id/editText_port"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@string/edittext_port"
+                android:hint="@string/edittext_port_hint"
+                android:textAlignment="center"
+                android:inputType="number"
+                android:importantForAutofill="no"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/textview_sale_ip"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/textview_separator"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/textview_sale_port"
+                android:textAlignment="center"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp">
+
+            <EditText
+                android:id="@+id/editText_sale_ip"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@string/edittext_ip"
+                android:hint="@string/edittext_ip_hint"
+                android:textAlignment="center"
+                android:inputType="text"
+                android:importantForAutofill="no"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/textview_separator"
+                android:textSize="24sp"
+                />
+
+            <EditText
+                android:id="@+id/editText_sale_port"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"

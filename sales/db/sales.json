@@ -1,16 +1,32 @@
 [
-    {
-        "client_id": "123",
-        "details": [
-            { "product_id": "A1", "amount": 2, "price": 10.5 },
-            { "product_id": "B3", "amount": 1, "price": 5.75 }
-        ]
-    },
-    {
-        "client_id": "456",
-        "details": [
-            { "product_id": "C2", "amount": 3, "price": 15.0 },
-            { "product_id": "D4", "amount": 1, "price": 30.0 }
-        ]
-    }
+  {
+    "client_id": "123",
+    "details": [
+      {
+        "product_id": "A1",
+        "amount": 2,
+        "price": 10.5
+      },
+      {
+        "product_id": "B3",
+        "amount": 1,
+        "price": 5.75
+      }
+    ]
+  },
+  {
+    "client_id": "456",
+    "details": [
+      {
+        "product_id": "C2",
+        "amount": 3,
+        "price": 15
+      },
+      {
+        "product_id": "D4",
+        "amount": 1,
+        "price": 30
+      }
+    ]
+  }
 ]

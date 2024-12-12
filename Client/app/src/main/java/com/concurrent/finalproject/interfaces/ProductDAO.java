@@ -8,7 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ProductDAO {
-    @GET("api/products")
+    @GET("almacen")
     Call<List<Product>> getProducts();
 
 }

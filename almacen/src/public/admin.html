@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Almacén</title>
+    <style>
+        /* Estilos básicos */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .selected {
+            background-color: #f2f2f2;
+        }
+        .form-container {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Administrar Almacén</h1>
+
+    <!-- Formulario para agregar un producto -->
+    <div class="form-container">
+        <h2>Agregar Producto</h2>
+        <label>Nombre: </label>
+        <input type="text" id="new-product-name" />
+        <label>Stock: </label>
+        <input type="number" id="new-product-stock" />
+        <label>Precio: </label>
+        <input type="number" id="new-product-price" />
+        <button id="add-product">Agregar Producto</button>
+    </div>
+
+    <!-- Tabla para mostrar productos -->
+    <h2>Lista de Productos</h2>
+    <table id="product-table">
+        <thead>
+            <tr>
+                <th>Seleccionar</th>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Stock</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los productos se llenarán dinámicamente -->
+        </tbody>
+    </table>
+
+    <!-- Botones de acción -->
+    <button id="update-product">Modificar Producto</button>
+    <button id="delete-product">Eliminar Producto</button>
+
+    <script>
+        let selectedRow = null;
+
+        // Función para obtener productos y actualizarlos en la tabla
+        async function fetchProducts() {
+            const response = await fetch('/almacen');
+            const products = await response.json();
+            const tableBody = document.querySelector("#product-table tbody");
+            tableBody.innerHTML = ""; // Limpiar tabla antes de agregar nuevos datos
+            products.forEach(product => {
+                const row = document.createElement("tr");
+                row.setAttribute("data-id", product.product_id);
+                row.innerHTML = `
+                    <td><input type="checkbox" class="select-row" /></td>
+                    <td>${product.product_id}</td> <!-- No editable -->
+                    <td>${product.name}</td> <!-- No editable -->
+                    <td contenteditable="true">${product.stock}</td> <!-- Editable -->
+                    <td contenteditable="true">${product.price}</td> <!-- Editable -->
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Llamar la función para obtener productos cuando la página cargue
+        window.onload = fetchProducts;
+
+        // Función para agregar un producto
+        document.getElementById("add-product").addEventListener("click", async () => {
+            const name = document.getElementById("new-product-name").value;
+            const stock = parseInt(document.getElementById("new-product-stock").value, 10);
+            const price = parseFloat(document.getElementById("new-product-price").value);
+
+            if (!name || isNaN(stock) || isNaN(price)) {
+                alert("Por favor, completa todos los campos correctamente.");
+                return;
+            }
+
+            const products = await fetch('/almacen').then(res => res.json());
+            const newProductId = products.length > 0 ? Math.max(...products.map(p => p.product_id)) + 1 : 1;
+
+            const newProduct = {
+                product_id: newProductId, // Generamos ID único
+                name,
+                stock,
+                price
+            };
+
+            const response = await fetch('/almacen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProduct)
+            });
+
+            if (response.ok) {
+                fetchProducts(); // Actualizar la tabla
+                alert("Producto agregado correctamente.");
+            } else {
+                alert("Error al agregar el producto.");
+            }
+        });
+
+        // Función para modificar el producto
+        document.getElementById("update-product").addEventListener("click", async () => {
+            const rows = document.querySelectorAll("#product-table tbody tr");
+
+            rows.forEach(row => {
+                const productId = row.getAttribute("data-id");
+                const stock = parseInt(row.cells[3].textContent, 10);
+                const price = parseFloat(row.cells[4].textContent);
+
+                if (productId && (stock >= 0 && price >= 0)) {
+                    fetch(`/almacen/${productId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ stock, price })
+                    }).then(response => {
+                        if (response.ok) {
+                            fetchProducts(); // Actualizar la tabla
+                            alert("Producto actualizado.");
+                        } else {
+                            alert("Error al actualizar el producto.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Función para eliminar productos
+        document.getElementById("delete-product").addEventListener("click", async () => {
+            const checkboxes = document.querySelectorAll(".select-row:checked");
+            const idsToDelete = [];
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest("tr");
+                const productId = row.getAttribute("data-id");
+                idsToDelete.push(productId);
+            });
+
+            if (idsToDelete.length > 0) {
+                const response = await fetch('/almacen', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_ids: idsToDelete })
+                });
+
+                if (response.ok) {
+                    fetchProducts(); // Actualizar la tabla
+                    alert("Productos eliminados.");
+                } else {
+                    alert("Error al eliminar los productos.");
+                }
+            } else {
+                alert("Selecciona al menos un producto para eliminar.");
+            }
+        });
+
+        // Función para seleccionar/desmarcar filas
+        document.querySelector("#product-table").addEventListener("click", (event) => {
+            if (event.target.classList.contains("select-row")) {
+                const row = event.target.closest("tr");
+                row.classList.toggle("selected", event.target.checked);
+            }
+        });
+    </script>
+</body>
+</html>

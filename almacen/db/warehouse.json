@@ -1,6 +1,32 @@
 [
-    { "product_id": "1", "name": "Producto A", "stock": 50, "price": 10.5 },
-    { "product_id": "2", "name": "Producto B", "stock": 30, "price": 5.75 },
-    { "product_id": "3", "name": "Producto C", "stock": 20, "price": 15.0 },
-    { "product_id": "4", "name": "Producto D", "stock": 10, "price": 30.0 }
+  {
+    "product_id": "1",
+    "name": "Producto A",
+    "stock": 49,
+    "price": 10.5
+  },
+  {
+    "product_id": "2",
+    "name": "Producto B",
+    "stock": 30,
+    "price": 5.75
+  },
+  {
+    "product_id": "3",
+    "name": "Producto C",
+    "stock": 20,
+    "price": 15
+  },
+  {
+    "product_id": "4",
+    "name": "Producto D",
+    "stock": 42,
+    "price": 22
+  },
+  {
+    "product_id": "21",
+    "name": "product N",
+    "stock": 3,
+    "price": 9.99
+  }
 ]

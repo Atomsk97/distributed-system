@@ -11,18 +11,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.concurrent.finalproject.interfaces.ProductDAO;
 import com.concurrent.finalproject.models.Product;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class OperationsActivity extends AppCompatActivity {
 
     private final List<Product> listOfProductsToBuy = new ArrayList<>();
+    List<Product> productList;
 
     private Button buttonConfirmUser;
 
@@ -53,7 +55,7 @@ public class OperationsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView_products);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        List<Product> productList = MainActivity.products;
+        productList = MainActivity.products;
 
         ProductAdapter productAdapter = new ProductAdapter(productList);
         recyclerView.setAdapter(productAdapter);
@@ -75,8 +77,6 @@ public class OperationsActivity extends AppCompatActivity {
         });
 
         buttonAddProduct.setOnClickListener(view -> {
-            return;
-            /* TODO: IMPLEMENT ADD PRODUCT LOGIC
             int productId;
             try {
                 productId = Integer.parseInt(editTextProductId.getText().toString());
@@ -90,19 +90,24 @@ public class OperationsActivity extends AppCompatActivity {
                 productAmount = 0;
             }
 
+            /*
             if(!isIdCorrect(productId)){
                 showToast("ID not found in list");
                 return;
             }
+             */
+
             if(productAmount <= 0){
                 showToast("Can not add an empty amount");
                 return;
             }
 
-            //listOfProductsToBuy.add(new Product(productId, "", 0.0, productAmount));
-            totalAmount += getPrice(productId)*productAmount;
+            //totalAmount += getPrice(productId)*productAmount;
+            totalAmount += 1;
+            listOfProductsToBuy.add(new Product(String.valueOf(productId), productAmount));
+            editTextProductId.setText("");
+            editTextAmount.setText("");
             showToast("Product added in the cart");
-             */
         });
 
         buttonSubmit.setOnClickListener(view -> {
@@ -123,35 +128,8 @@ public class OperationsActivity extends AppCompatActivity {
                 waitDialog.show();
             }
 
-            JSONObject user = new JSONObject();
-            JSONArray productsToBuy = new JSONArray();
-            JSONObject message = new JSONObject();
-            try{
-                user.put("request", "BUY");
-                user.put("idClient", userId);
-                user.put("amount", totalAmount);
-
-                for(Product p : listOfProductsToBuy){
-                    try {
-                        JSONObject product = new JSONObject();
-                        product.put("id", p.getID());
-                        product.put("amount", p.getStock());
-                        productsToBuy.put(product);
-                    }catch (JSONException e){
-                        System.out.println("Error in JSON creation for multiple items:\n" + e.getMessage());
-                        return;
-                    }
-                }
-                try {
-                    message.put("request", "BUY");
-                    message.put("products", productsToBuy);
-                }catch (JSONException e){
-                    System.out.println("Error in JSON message:\n" + e.getMessage());
-                }
-            }catch (JSONException e){
-                System.out.println("Error in JSON creations for the user:\n" + e.getMessage());
-            }
-
+           //TODO: Submit action with Retrofit
+            updateRecyclerView();
         });
     }
 
@@ -181,34 +159,36 @@ public class OperationsActivity extends AppCompatActivity {
         }
     }
 
-    /*
     private void updateRecyclerView(){
-        JSONObject messageJson = new JSONObject();
-        try {
-            messageJson.put("request", "INFO");
-            new Thread(() -> {
-                try {
-                    String data = MainActivity.call(messageJson.toString(), MainActivity.requestProductQueueName);
-                    if(data.equals("")){
-                        System.out.println("NO DATA WAS RETRIEVED");
-                        return;
-                    }
+        ProductDAO productDAO = MainActivity.retrofit.create(ProductDAO.class);
+        Call<List<Product>> call = productDAO.getProducts();
 
-                    Gson gson = new Gson();
-                    ProductResponse response = gson.fromJson(data, ProductResponse.class);
-                    products = response.getResult();
-                    List<Product> productList = Arrays.asList(products);
-                    runOnUiThread(() -> recyclerView.setAdapter(new ProductAdapter(productList)));
-                }catch (IOException | InterruptedException | ExecutionException e) {
-                    System.out.println("ERROR ON CALL:\n" + e.getMessage());
+        call.enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                if(response.isSuccessful()){
+                    productList = response.body();
+                    if(productList != null){
+                        runOnUiThread(() -> recyclerView.setAdapter(new ProductAdapter(productList)));
+                        System.out.println("LIST UPDATED!");
+                    }else{
+                        System.out.println("LIST IS EMPTY!");
+                    }
+                    dismissWaitDialog();
+                }else{
+                    System.out.println("FAILED IN RESPONSE");
+                    dismissWaitDialog();
                 }
-            }).start();
-        } catch (JSONException e) {
-            System.out.println("ERROR ON JSON creation:\n" + e.getMessage());
-        }
+            }
+
+            @Override
+            public void onFailure(Call<List<Product>> call, Throwable t) {
+                System.out.println("onFailure in Update RecyclerView:\n" + t.getMessage());
+                dismissWaitDialog();
+            }
+        });
     }
 
-     */
 
     private void showToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();

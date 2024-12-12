@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static List<Product> products = new ArrayList<>();
 
+    public static Retrofit retrofit = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 waitDialog.show();
             }
 
-            Retrofit retrofit = new Retrofit.Builder()
+            retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -73,12 +75,13 @@ public class MainActivity extends AppCompatActivity {
                                 System.out.println(products.get(i));
                             }
                         }
+                        dismissWaitDialog();
                         Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
                         startActivity(intent);
                     }else {
                         System.out.println("FAILED");
+                        dismissWaitDialog();
                     }
-                    dismissWaitDialog();
                 }
 
                 @Override
@@ -101,6 +104,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return waitDialog;
+    }
+
+    public static void retrieveProducts(){
+        if(retrofit != null){
+            ProductDAO productDAO = retrofit.create(ProductDAO.class);
+            Call<List<Product>> call = productDAO.getProducts();
+
+            call.enqueue(new Callback<List<Product>>() {
+                @Override
+                public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                    if(response.isSuccessful()){
+                        products = response.body();
+                        System.out.println("PRODUCTS RETRIEVED");
+                    }else{
+                        System.out.println("FAIL ON RESPONSE");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Product>> call, Throwable t) {
+                    System.out.println("FAIL TO RETRIEVE THE PRODUCT LIST:\n" + t.getMessage());
+                }
+            });
+        }
     }
 
     private void dismissWaitDialog(){

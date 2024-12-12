@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editTextIp, editTextPort;
+    EditText editTextIp, editTextPort, editTextSaleIp, editTextSalePort;
     Button buttonConnect;
 
     Dialog waitDialog = null;
@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         editTextIp = findViewById(R.id.editText_ip);
         editTextPort = findViewById(R.id.editText_port);
+        editTextSaleIp = findViewById(R.id.editText_sale_ip);
+        editTextSalePort = findViewById(R.id.editText_sale_port);
         buttonConnect = findViewById(R.id.button_connect);
 
         buttonConnect.setOnClickListener(view -> {
@@ -57,11 +59,6 @@ public class MainActivity extends AppCompatActivity {
                 waitDialog = makeWaitDialog(this);
                 waitDialog.show();
             }
-
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
 
             ProductDAO productDAO = retrofit.create(ProductDAO.class);
 
@@ -79,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                         dismissWaitDialog();
                         Intent intent = new Intent(MainActivity.this, OperationsActivity.class);
+                        intent.putExtra("saleIP", editTextSaleIp.getText().toString());
+                        intent.putExtra("salePORT", editTextSalePort.getText().toString());
                         startActivity(intent);
                     } else {
                         System.out.println("FAILED");

@@ -2,8 +2,10 @@
     <string name="app_name">FinalProject</string>
 
     <!-- START VIEW -->
-    <string name="textview_ip">IP</string>
-    <string name="textview_port">PORT</string>
+    <string name="textview_ip">WAREHOUSE IP</string>
+    <string name="textview_port">WAREHOUSE PORT</string>
+    <string name="textview_sale_ip">SALES IP</string>
+    <string name="textview_sale_port">SALES PORT</string>
     <string name="textview_separator">:</string>
     <string name="edittext_ip">127.0.0.1</string>
     <string name="edittext_ip_hint">IP of Server</string>

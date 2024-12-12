@@ -32,7 +32,7 @@ public class OperationsActivity extends AppCompatActivity {
 
     private EditText editTextProductId, editTextAmount;
 
-    private String userId;
+    private String userId, baseSalesUrl;
 
     //private double totalAmount = 0;
 
@@ -44,6 +44,10 @@ public class OperationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operations);
+
+        String salesIP = getIntent().getStringExtra("saleIP");
+        String salesPort = getIntent().getStringExtra("salePORT");
+        baseSalesUrl = "http://" + salesIP + ":" + salesPort + "/";
 
         editTextProductId = findViewById(R.id.editText_product_id);
         editTextAmount = findViewById(R.id.editText_amount);
@@ -109,7 +113,7 @@ public class OperationsActivity extends AppCompatActivity {
             RequestBody requestBody = new RequestBody(userId, details);
 
             Retrofit retrofitToSales = new Retrofit.Builder()
-                    .baseUrl("http: /")
+                    .baseUrl(baseSalesUrl)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
@@ -121,8 +125,10 @@ public class OperationsActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
                     if (response.isSuccessful()) {
+                        runOnUiThread(() -> showToast("Transaction completed!"));
                         System.out.println("YES");
                     } else {
+                        runOnUiThread(() -> showToast("Something went wrong in the server"));
                         System.out.println("OH NOUS");
                     }
                     updateRecyclerView();
@@ -160,12 +166,14 @@ public class OperationsActivity extends AppCompatActivity {
                     productList = response.body();
                     if (productList != null) {
                         runOnUiThread(() -> recyclerView.setAdapter(new ProductAdapter(productList, editTextProductId, editTextAmount)));
+                        runOnUiThread(() -> showToast("List updated"));
                         System.out.println("LIST UPDATED!");
                     } else {
                         System.out.println("LIST IS EMPTY!");
                     }
                     dismissWaitDialog();
                 } else {
+                    runOnUiThread(() -> showToast("Failed to retrieve the lasted list"));
                     System.out.println("FAILED IN RESPONSE");
                     dismissWaitDialog();
                 }

@@ -3,20 +3,20 @@ package com.concurrent.finalproject.models;
 import java.util.List;
 
 public class RequestBody {
-    private String clientId;
+    private String client_id;
     private List<Detail> details;
 
-    public RequestBody(String clientId, List<Detail> details) {
-        this.clientId = clientId;
+    public RequestBody(String client_id, List<Detail> details) {
+        this.client_id = client_id;
         this.details = details;
     }
 
     public String getClientId() {
-        return clientId;
+        return client_id;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClientId(String client_id) {
+        this.client_id = client_id;
     }
 
     public List<Detail> getDetails() {

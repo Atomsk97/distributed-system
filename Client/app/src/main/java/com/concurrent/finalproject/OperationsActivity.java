@@ -144,9 +144,12 @@ public class OperationsActivity extends AppCompatActivity {
     private double getPriceFromId(int id){
         int index = 0;
         for(int i = 0; i < productList.size(); i++){
-            
+            if (productList.get(i).getProduct_id().equals(String.valueOf(id))){
+                index = i;
+                break;
+            }
         }
-        return productList.get(id - 1).getPrice();
+        return productList.get(index).getPrice();
     }
 
     @Override

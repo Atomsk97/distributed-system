@@ -1,5 +1,6 @@
 package com.concurrent.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             Call<List<Product>> call = productDAO.getProducts();
             call.enqueue(new Callback<List<Product>>() {
                 @Override
-                public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                public void onResponse(@NonNull Call<List<Product>> call, @NonNull Response<List<Product>> response) {
                     if (response.isSuccessful()) {
                         products = response.body();
                         if (products != null) {
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<List<Product>> call, Throwable t) {
+                public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
                     System.out.println("onFailure: " + t.getMessage());
                     dismissWaitDialog();
                 }

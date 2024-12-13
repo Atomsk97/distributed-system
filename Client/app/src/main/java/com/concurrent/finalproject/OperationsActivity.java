@@ -1,5 +1,6 @@
 package com.concurrent.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,9 +66,7 @@ public class OperationsActivity extends AppCompatActivity {
 
         waitDialog = MainActivity.makeWaitDialog(this);
 
-        imageViewRefresh.setOnClickListener(view -> {
-            updateRecyclerView();
-        });
+        imageViewRefresh.setOnClickListener(view -> updateRecyclerView());
 
         buttonAddProduct.setOnClickListener(view -> {
             int productId;
@@ -122,7 +121,7 @@ public class OperationsActivity extends AppCompatActivity {
 
             call.enqueue(new Callback<RequestBody>() {
                 @Override
-                public void onResponse(Call<RequestBody> call, Response<RequestBody> response) {
+                public void onResponse(@NonNull Call<RequestBody> call, @NonNull Response<RequestBody> response) {
                     if (response.isSuccessful()) {
                         runOnUiThread(() -> showToast("Transaction completed!"));
                     } else {
@@ -133,7 +132,7 @@ public class OperationsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<RequestBody> call, Throwable t) {
+                public void onFailure(@NonNull Call<RequestBody> call, @NonNull Throwable t) {
                     System.out.println("onFailure: " + t.getMessage());
                     dismissWaitDialog();
                 }
@@ -164,7 +163,7 @@ public class OperationsActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<List<Product>>() {
             @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+            public void onResponse(@NonNull Call<List<Product>> call, @NonNull Response<List<Product>> response) {
                 if (response.isSuccessful()) {
                     productList = response.body();
                     if (productList != null) {
@@ -183,7 +182,7 @@ public class OperationsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
                 System.out.println("onFailure in Update RecyclerView:\n" + t.getMessage());
                 dismissWaitDialog();
             }
